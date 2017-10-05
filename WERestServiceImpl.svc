@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="WCFRestServicePMD.WERestServiceImpl" CodeBehind="WERestServiceImpl.svc.cs" %>

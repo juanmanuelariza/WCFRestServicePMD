@@ -1,0 +1,753 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ProgMilDiasModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="auxiliarNotificaciones">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SEGUIMIENTO_ID" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="RESPUESTA" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FECHA_RECEPCION_DE_RESPUESTA" Type="datetime" Nullable="false" />
+          <Property Name="REGISTRO_LEIDO" Type="bit" Nullable="false" />
+          <Property Name="FECHA_LECTURA_REGISTRO" Type="datetime" />
+        </EntityType>
+        <EntityType Name="embarazada">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DNI" Type="int" Nullable="false" />
+          <Property Name="FECHA_INSCRIPCION" Type="datetime" Nullable="false" />
+          <Property Name="MES_GESTACION" Type="tinyint" Nullable="false" />
+          <Property Name="TELEFONO" Type="nvarchar" MaxLength="20" />
+          <Property Name="EMPRESAID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="empresa">
+          <Key>
+            <PropertyRef Name="EmpresaID" />
+          </Key>
+          <Property Name="EmpresaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="historialDeNotificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EMBARAZADA_ID" Type="int" Nullable="false" />
+          <Property Name="FECHA_ENVIO" Type="datetime" Nullable="false" />
+          <Property Name="NOTIFICACION_ID" Type="int" Nullable="false" />
+          <Property Name="ENVIADO" Type="bit" Nullable="false" />
+          <Property Name="RESPUESTA" Type="bit" />
+          <Property Name="SEGUIMIENTO_ID" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="logDeSucesos">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FECHA" Type="datetime" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="nvarchar" MaxLength="250" Nullable="false" />
+        </EntityType>
+        <EntityType Name="logMensajes">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Fecha" Type="date" Nullable="false" />
+          <Property Name="Mensaje" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Origen" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="notificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NRO_ORDEN" Type="int" Nullable="false" />
+          <Property Name="MENSAJE" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="MES_GESTACION" Type="tinyint" Nullable="false" />
+          <Property Name="REQUIERE_RESPUESTA" Type="bit" Nullable="false" />
+          <Property Name="NOTIFICACION_ID_RESP_POS" Type="int" />
+          <Property Name="NOTIFICACION_ID_RESP_NEG" Type="int" />
+          <Property Name="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" Type="bit" />
+          <Property Name="NOTIFICACION_HABILITANTE" Type="int" />
+          <Property Name="ACTIVO" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_embarazada_empresa">
+          <End Role="empresa" Type="Self.empresa" Multiplicity="1" />
+          <End Role="embarazada" Type="Self.embarazada" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="empresa">
+              <PropertyRef Name="EmpresaID" />
+            </Principal>
+            <Dependent Role="embarazada">
+              <PropertyRef Name="EMPRESAID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_historialDeNotificacion_embarazada">
+          <End Role="embarazada" Type="Self.embarazada" Multiplicity="1" />
+          <End Role="historialDeNotificacion" Type="Self.historialDeNotificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="embarazada">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="historialDeNotificacion">
+              <PropertyRef Name="EMBARAZADA_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_historialDeNotificacion_notificacion">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="1" />
+          <End Role="historialDeNotificacion" Type="Self.historialDeNotificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="historialDeNotificacion">
+              <PropertyRef Name="NOTIFICACION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_HABILITANTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion1">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_ID_RESP_NEG" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion2">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_ID_RESP_POS" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="actualizarEstadoDeRespuesta" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="actualizarHistorialDeNotificacion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SEGUIMIENTO_ID" Type="nvarchar" Mode="In" />
+          <Parameter Name="RESPUESTA" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="getEmbarazada" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="dni" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getEmbarazadaLista" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="getEmbarazadaListaConGestacionActualizada" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="requiere_respuesta" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="getEmbarazadaListaConGestacionActualizadaBack" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="requiere_respuesta" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="getExisteEmbarazada" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="dni" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getHistorialNotificacionPorSeguimientoID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="seguimiento_id" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getListaDeRespuestas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="getNotificacionPorID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="id" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="insertNuevoRegistroEmbarazada" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="dni" Type="int" Mode="In" />
+          <Parameter Name="mes" Type="int" Mode="In" />
+          <Parameter Name="telefono" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="insertNuevoRegistroHistorialNotificacion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="embarazada_id" Type="int" Mode="In" />
+          <Parameter Name="notificacion_id" Type="int" Mode="In" />
+          <Parameter Name="respuesta" Type="bit" Mode="In" />
+          <Parameter Name="seguimiento_id" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="insertRegistroLog" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="descripcion" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="registrarRespuesta" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="id" Type="bigint" Mode="In" />
+          <Parameter Name="respuesta" Type="bit" Mode="In" />
+        </Function>
+        <EntityContainer Name="ProgMilDiasModelStoreContainer">
+          <EntitySet Name="auxiliarNotificaciones" EntityType="Self.auxiliarNotificaciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="embarazada" EntityType="Self.embarazada" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="empresa" EntityType="Self.empresa" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="historialDeNotificacion" EntityType="Self.historialDeNotificacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="logDeSucesos" EntityType="Self.logDeSucesos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="logMensajes" EntityType="Self.logMensajes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="notificacion" EntityType="Self.notificacion" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_embarazada_empresa" Association="Self.FK_embarazada_empresa">
+            <End Role="empresa" EntitySet="empresa" />
+            <End Role="embarazada" EntitySet="embarazada" />
+          </AssociationSet>
+          <AssociationSet Name="FK_historialDeNotificacion_embarazada" Association="Self.FK_historialDeNotificacion_embarazada">
+            <End Role="embarazada" EntitySet="embarazada" />
+            <End Role="historialDeNotificacion" EntitySet="historialDeNotificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_historialDeNotificacion_notificacion" Association="Self.FK_historialDeNotificacion_notificacion">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="historialDeNotificacion" EntitySet="historialDeNotificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion" Association="Self.FK_notificacion_notificacion">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion1" Association="Self.FK_notificacion_notificacion1">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion2" Association="Self.FK_notificacion_notificacion2">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ProgMilDiasModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="auxiliarNotificaciones">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SEGUIMIENTO_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RESPUESTA" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FECHA_RECEPCION_DE_RESPUESTA" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="REGISTRO_LEIDO" Type="Boolean" Nullable="false" />
+          <Property Name="FECHA_LECTURA_REGISTRO" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="embarazada">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DNI" Type="Int32" Nullable="false" />
+          <Property Name="FECHA_INSCRIPCION" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MES_GESTACION" Type="Byte" Nullable="false" />
+          <Property Name="TELEFONO" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="historialDeNotificacion" Relationship="Self.FK_historialDeNotificacion_embarazada" FromRole="embarazada" ToRole="historialDeNotificacion" />
+          <Property Name="EMPRESAID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="empresa" Relationship="ProgMilDiasModel.FK_embarazada_empresa" FromRole="embarazada" ToRole="empresa" />
+        </EntityType>
+        <EntityType Name="historialDeNotificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EMBARAZADA_ID" Type="Int32" Nullable="false" />
+          <Property Name="FECHA_ENVIO" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="NOTIFICACION_ID" Type="Int32" Nullable="false" />
+          <Property Name="ENVIADO" Type="Boolean" Nullable="false" />
+          <Property Name="RESPUESTA" Type="Boolean" />
+          <Property Name="SEGUIMIENTO_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="embarazada" Relationship="Self.FK_historialDeNotificacion_embarazada" FromRole="historialDeNotificacion" ToRole="embarazada" />
+          <NavigationProperty Name="notificacion" Relationship="Self.FK_historialDeNotificacion_notificacion" FromRole="historialDeNotificacion" ToRole="notificacion" />
+        </EntityType>
+        <EntityType Name="logDeSucesos">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FECHA" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DESCRIPCION" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="notificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NRO_ORDEN" Type="Int32" Nullable="false" />
+          <Property Name="MENSAJE" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MES_GESTACION" Type="Byte" Nullable="false" />
+          <Property Name="REQUIERE_RESPUESTA" Type="Boolean" Nullable="false" />
+          <Property Name="NOTIFICACION_ID_RESP_POS" Type="Int32" />
+          <Property Name="NOTIFICACION_ID_RESP_NEG" Type="Int32" />
+          <Property Name="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" Type="Boolean" />
+          <Property Name="NOTIFICACION_HABILITANTE" Type="Int32" />
+          <Property Name="ACTIVO" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="historialDeNotificacion" Relationship="Self.FK_historialDeNotificacion_notificacion" FromRole="notificacion" ToRole="historialDeNotificacion" />
+          <NavigationProperty Name="notificacion1" Relationship="Self.FK_notificacion_notificacion" FromRole="notificacion" ToRole="notificacion1" />
+          <NavigationProperty Name="notificacion2" Relationship="Self.FK_notificacion_notificacion" FromRole="notificacion1" ToRole="notificacion" />
+          <NavigationProperty Name="notificacion11" Relationship="Self.FK_notificacion_notificacion1" FromRole="notificacion" ToRole="notificacion1" />
+          <NavigationProperty Name="notificacion3" Relationship="Self.FK_notificacion_notificacion1" FromRole="notificacion1" ToRole="notificacion" />
+          <NavigationProperty Name="notificacion12" Relationship="Self.FK_notificacion_notificacion2" FromRole="notificacion" ToRole="notificacion1" />
+          <NavigationProperty Name="notificacion4" Relationship="Self.FK_notificacion_notificacion2" FromRole="notificacion1" ToRole="notificacion" />
+        </EntityType>
+        <Association Name="FK_historialDeNotificacion_embarazada">
+          <End Role="embarazada" Type="Self.embarazada" Multiplicity="1" />
+          <End Role="historialDeNotificacion" Type="Self.historialDeNotificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="embarazada">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="historialDeNotificacion">
+              <PropertyRef Name="EMBARAZADA_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_historialDeNotificacion_notificacion">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="1" />
+          <End Role="historialDeNotificacion" Type="Self.historialDeNotificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="historialDeNotificacion">
+              <PropertyRef Name="NOTIFICACION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_HABILITANTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion1">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_ID_RESP_NEG" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notificacion_notificacion2">
+          <End Role="notificacion" Type="Self.notificacion" Multiplicity="0..1" />
+          <End Role="notificacion1" Type="Self.notificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="notificacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="notificacion1">
+              <PropertyRef Name="NOTIFICACION_ID_RESP_POS" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ProgMilDiasEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="auxiliarNotificaciones" EntityType="Self.auxiliarNotificaciones" />
+          <EntitySet Name="embarazada" EntityType="Self.embarazada" />
+          <EntitySet Name="historialDeNotificacion" EntityType="Self.historialDeNotificacion" />
+          <EntitySet Name="logDeSucesos" EntityType="Self.logDeSucesos" />
+          <EntitySet Name="notificacion" EntityType="Self.notificacion" />
+          <AssociationSet Name="FK_historialDeNotificacion_embarazada" Association="Self.FK_historialDeNotificacion_embarazada">
+            <End Role="embarazada" EntitySet="embarazada" />
+            <End Role="historialDeNotificacion" EntitySet="historialDeNotificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_historialDeNotificacion_notificacion" Association="Self.FK_historialDeNotificacion_notificacion">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="historialDeNotificacion" EntitySet="historialDeNotificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion" Association="Self.FK_notificacion_notificacion">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion1" Association="Self.FK_notificacion_notificacion1">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notificacion_notificacion2" Association="Self.FK_notificacion_notificacion2">
+            <End Role="notificacion" EntitySet="notificacion" />
+            <End Role="notificacion1" EntitySet="notificacion" />
+          </AssociationSet>
+          <FunctionImport Name="actualizarEstadoDeRespuesta" ReturnType="Collection(ProgMilDiasModel.actualizarEstadoDeRespuesta_Result)">
+          <Parameter Name="ID" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="actualizarHistorialDeNotificacion" ReturnType="Collection(Boolean)">
+            <Parameter Name="SEGUIMIENTO_ID" Mode="In" Type="String" />
+            <Parameter Name="RESPUESTA" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getEmbarazada" ReturnType="Collection(ProgMilDiasModel.getEmbarazada_Result)">
+          <Parameter Name="dni" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getEmbarazadaLista" ReturnType="Collection(ProgMilDiasModel.getEmbarazadaLista_Result)" />
+          <FunctionImport Name="getEmbarazadaListaConGestacionActualizada" ReturnType="Collection(ProgMilDiasModel.getEmbarazadaListaConGestacionActualizada_Result)">
+          <Parameter Name="requiere_respuesta" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getEmbarazadaListaConGestacionActualizadaBack" ReturnType="Collection(ProgMilDiasModel.getEmbarazadaListaConGestacionActualizadaBack_Result)">
+          <Parameter Name="requiere_respuesta" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getExisteEmbarazada" ReturnType="Collection(Boolean)">
+          <Parameter Name="dni" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getHistorialNotificacionPorSeguimientoID" ReturnType="Collection(ProgMilDiasModel.getHistorialNotificacionPorSeguimientoID_Result)">
+          <Parameter Name="seguimiento_id" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getListaDeRespuestas" ReturnType="Collection(ProgMilDiasModel.getListaDeRespuestas_Result)" />
+          <FunctionImport Name="getNotificacionPorID" ReturnType="Collection(ProgMilDiasModel.getNotificacionPorID_Result)">
+          <Parameter Name="id" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="insertNuevoRegistroEmbarazada">
+            <Parameter Name="dni" Mode="In" Type="Int32" />
+            <Parameter Name="mes" Mode="In" Type="Int32" />
+            <Parameter Name="telefono" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="insertNuevoRegistroHistorialNotificacion">
+            <Parameter Name="embarazada_id" Mode="In" Type="Int32" />
+            <Parameter Name="notificacion_id" Mode="In" Type="Int32" />
+            <Parameter Name="respuesta" Mode="In" Type="Boolean" />
+            <Parameter Name="seguimiento_id" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="insertRegistroLog">
+          <Parameter Name="descripcion" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="registrarRespuesta" ReturnType="Collection(Boolean)">
+            <Parameter Name="id" Mode="In" Type="Int64" />
+            <Parameter Name="respuesta" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <EntitySet Name="empresa" EntityType="ProgMilDiasModel.empresa" />
+          <AssociationSet Name="FK_embarazada_empresa" Association="ProgMilDiasModel.FK_embarazada_empresa">
+            <End Role="empresa" EntitySet="empresa" />
+            <End Role="embarazada" EntitySet="embarazada" />
+          </AssociationSet>
+          <EntitySet Name="logMensajes" EntityType="ProgMilDiasModel.logMensajes" />
+        </EntityContainer>
+        <ComplexType Name="getEmbarazada_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="DNI" Nullable="false" />
+          <Property Type="DateTime" Name="FECHA_INSCRIPCION" Nullable="false" Precision="23" />
+          <Property Type="Byte" Name="MES_GESTACION" Nullable="false" />
+          <Property Type="String" Name="TELEFONO" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="getEmbarazadaLista_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="DNI" Nullable="false" />
+          <Property Type="DateTime" Name="FECHA_INSCRIPCION" Nullable="false" Precision="23" />
+          <Property Type="Byte" Name="MES_GESTACION" Nullable="false" />
+          <Property Type="String" Name="TELEFONO" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="getEmbarazadaListaConGestacionActualizada_Result">
+          <Property Type="Int32" Name="EMBARAZADA_ID" Nullable="true" />
+          <Property Type="DateTime" Name="FECHA_INSCRIPCION" Nullable="true" Precision="23" />
+          <Property Type="Byte" Name="MES_GESTACION" Nullable="true" />
+          <Property Type="Byte" Name="MES_GESTACION_ACTUAL" Nullable="true" />
+          <Property Type="Int32" Name="NOTIFICACION_ID" Nullable="true" />
+          <Property Type="Int32" Name="NRO_ORDEN" Nullable="true" />
+          <Property Type="String" Name="MENSAJE" Nullable="true" MaxLength="200" />
+          <Property Type="Boolean" Name="REQUIERE_RESPUESTA" Nullable="true" />
+          <Property Type="Int32" Name="DNI" Nullable="true" />
+          <Property Type="String" Name="TELEFONO" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="getEmbarazadaListaConGestacionActualizadaBack_Result">
+          <Property Type="Int32" Name="EMBARAZADA_ID" Nullable="true" />
+          <Property Type="DateTime" Name="FECHA_INSCRIPCION" Nullable="true" Precision="23" />
+          <Property Type="Byte" Name="MES_GESTACION" Nullable="true" />
+          <Property Type="Byte" Name="MES_GESTACION_ACTUAL" Nullable="true" />
+          <Property Type="Int32" Name="NOTIFICACION_ID" Nullable="true" />
+          <Property Type="Int32" Name="NRO_ORDEN" Nullable="true" />
+          <Property Type="String" Name="MENSAJE" Nullable="true" MaxLength="200" />
+          <Property Type="Boolean" Name="REQUIERE_RESPUESTA" Nullable="true" />
+          <Property Type="Int32" Name="DNI" Nullable="true" />
+          <Property Type="String" Name="TELEFONO" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="getHistorialNotificacionPorSeguimientoID_Result">
+          <Property Type="Int64" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="EMBARAZADA_ID" Nullable="false" />
+          <Property Type="DateTime" Name="FECHA_ENVIO" Nullable="false" Precision="23" />
+          <Property Type="Int32" Name="NOTIFICACION_ID" Nullable="false" />
+          <Property Type="Boolean" Name="ENVIADO" Nullable="false" />
+          <Property Type="Boolean" Name="RESPUESTA" Nullable="true" />
+          <Property Type="String" Name="SEGUIMIENTO_ID" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="getListaDeRespuestas_Result">
+          <Property Type="Int64" Name="ID" Nullable="false" />
+          <Property Type="String" Name="SEGUIMIENTO_ID" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="RESPUESTA" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="FECHA_RECEPCION_DE_RESPUESTA" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="REGISTRO_LEIDO" Nullable="false" />
+          <Property Type="DateTime" Name="FECHA_LECTURA_REGISTRO" Nullable="true" Precision="23" />
+        </ComplexType>
+        <ComplexType Name="getNotificacionPorID_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="NRO_ORDEN" Nullable="false" />
+          <Property Type="String" Name="MENSAJE" Nullable="false" MaxLength="200" />
+          <Property Type="Byte" Name="MES_GESTACION" Nullable="false" />
+          <Property Type="Boolean" Name="REQUIERE_RESPUESTA" Nullable="false" />
+          <Property Type="Int32" Name="NOTIFICACION_ID_RESP_POS" Nullable="true" />
+          <Property Type="Int32" Name="NOTIFICACION_ID_RESP_NEG" Nullable="true" />
+          <Property Type="Boolean" Name="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="actualizarEstadoDeRespuesta_Result">
+          <Property Type="Boolean" Name="ACTUALIZADO" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="empresa">
+          <Key>
+            <PropertyRef Name="EmpresaID" />
+          </Key>
+          <Property Name="EmpresaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="embarazada" Relationship="ProgMilDiasModel.FK_embarazada_empresa" FromRole="empresa" ToRole="embarazada" />
+        </EntityType>
+        <Association Name="FK_embarazada_empresa">
+          <End Type="ProgMilDiasModel.empresa" Role="empresa" Multiplicity="1" />
+          <End Type="ProgMilDiasModel.embarazada" Role="embarazada" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="empresa">
+              <PropertyRef Name="EmpresaID" />
+            </Principal>
+            <Dependent Role="embarazada">
+              <PropertyRef Name="EMPRESAID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="logMensajes">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Origen" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Mensaje" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ProgMilDiasModelStoreContainer" CdmEntityContainer="ProgMilDiasEntities">
+          <EntitySetMapping Name="auxiliarNotificaciones">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.auxiliarNotificaciones">
+              <MappingFragment StoreEntitySet="auxiliarNotificaciones">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="SEGUIMIENTO_ID" ColumnName="SEGUIMIENTO_ID" />
+                <ScalarProperty Name="RESPUESTA" ColumnName="RESPUESTA" />
+                <ScalarProperty Name="FECHA_RECEPCION_DE_RESPUESTA" ColumnName="FECHA_RECEPCION_DE_RESPUESTA" />
+                <ScalarProperty Name="REGISTRO_LEIDO" ColumnName="REGISTRO_LEIDO" />
+                <ScalarProperty Name="FECHA_LECTURA_REGISTRO" ColumnName="FECHA_LECTURA_REGISTRO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="embarazada">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.embarazada">
+              <MappingFragment StoreEntitySet="embarazada">
+                <ScalarProperty Name="EMPRESAID" ColumnName="EMPRESAID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="DNI" ColumnName="DNI" />
+                <ScalarProperty Name="FECHA_INSCRIPCION" ColumnName="FECHA_INSCRIPCION" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="historialDeNotificacion">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.historialDeNotificacion">
+              <MappingFragment StoreEntitySet="historialDeNotificacion">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="EMBARAZADA_ID" ColumnName="EMBARAZADA_ID" />
+                <ScalarProperty Name="FECHA_ENVIO" ColumnName="FECHA_ENVIO" />
+                <ScalarProperty Name="NOTIFICACION_ID" ColumnName="NOTIFICACION_ID" />
+                <ScalarProperty Name="ENVIADO" ColumnName="ENVIADO" />
+                <ScalarProperty Name="RESPUESTA" ColumnName="RESPUESTA" />
+                <ScalarProperty Name="SEGUIMIENTO_ID" ColumnName="SEGUIMIENTO_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="logDeSucesos">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.logDeSucesos">
+              <MappingFragment StoreEntitySet="logDeSucesos">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FECHA" ColumnName="FECHA" />
+                <ScalarProperty Name="DESCRIPCION" ColumnName="DESCRIPCION" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="notificacion">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.notificacion">
+              <MappingFragment StoreEntitySet="notificacion">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="NRO_ORDEN" ColumnName="NRO_ORDEN" />
+                <ScalarProperty Name="MENSAJE" ColumnName="MENSAJE" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="REQUIERE_RESPUESTA" ColumnName="REQUIERE_RESPUESTA" />
+                <ScalarProperty Name="NOTIFICACION_ID_RESP_POS" ColumnName="NOTIFICACION_ID_RESP_POS" />
+                <ScalarProperty Name="NOTIFICACION_ID_RESP_NEG" ColumnName="NOTIFICACION_ID_RESP_NEG" />
+                <ScalarProperty Name="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" ColumnName="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" />
+                <ScalarProperty Name="NOTIFICACION_HABILITANTE" ColumnName="NOTIFICACION_HABILITANTE" />
+                <ScalarProperty Name="ACTIVO" ColumnName="ACTIVO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="actualizarEstadoDeRespuesta" FunctionName="ProgMilDiasModel.Store.actualizarEstadoDeRespuesta" >
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.actualizarEstadoDeRespuesta_Result">
+                <ScalarProperty Name="ACTUALIZADO" ColumnName="ACTUALIZADO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="actualizarHistorialDeNotificacion" FunctionName="ProgMilDiasModel.Store.actualizarHistorialDeNotificacion" />
+          <FunctionImportMapping FunctionImportName="getEmbarazada" FunctionName="ProgMilDiasModel.Store.getEmbarazada">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getEmbarazada_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="DNI" ColumnName="DNI" />
+                <ScalarProperty Name="FECHA_INSCRIPCION" ColumnName="FECHA_INSCRIPCION" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getEmbarazadaLista" FunctionName="ProgMilDiasModel.Store.getEmbarazadaLista">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getEmbarazadaLista_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="DNI" ColumnName="DNI" />
+                <ScalarProperty Name="FECHA_INSCRIPCION" ColumnName="FECHA_INSCRIPCION" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getEmbarazadaListaConGestacionActualizada" FunctionName="ProgMilDiasModel.Store.getEmbarazadaListaConGestacionActualizada">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getEmbarazadaListaConGestacionActualizada_Result">
+                <ScalarProperty Name="EMBARAZADA_ID" ColumnName="EMBARAZADA_ID" />
+                <ScalarProperty Name="FECHA_INSCRIPCION" ColumnName="FECHA_INSCRIPCION" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="MES_GESTACION_ACTUAL" ColumnName="MES_GESTACION_ACTUAL" />
+                <ScalarProperty Name="NOTIFICACION_ID" ColumnName="NOTIFICACION_ID" />
+                <ScalarProperty Name="NRO_ORDEN" ColumnName="NRO_ORDEN" />
+                <ScalarProperty Name="MENSAJE" ColumnName="MENSAJE" />
+                <ScalarProperty Name="REQUIERE_RESPUESTA" ColumnName="REQUIERE_RESPUESTA" />
+                <ScalarProperty Name="DNI" ColumnName="DNI" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getEmbarazadaListaConGestacionActualizadaBack" FunctionName="ProgMilDiasModel.Store.getEmbarazadaListaConGestacionActualizadaBack">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getEmbarazadaListaConGestacionActualizadaBack_Result">
+                <ScalarProperty Name="EMBARAZADA_ID" ColumnName="EMBARAZADA_ID" />
+                <ScalarProperty Name="FECHA_INSCRIPCION" ColumnName="FECHA_INSCRIPCION" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="MES_GESTACION_ACTUAL" ColumnName="MES_GESTACION_ACTUAL" />
+                <ScalarProperty Name="NOTIFICACION_ID" ColumnName="NOTIFICACION_ID" />
+                <ScalarProperty Name="NRO_ORDEN" ColumnName="NRO_ORDEN" />
+                <ScalarProperty Name="MENSAJE" ColumnName="MENSAJE" />
+                <ScalarProperty Name="REQUIERE_RESPUESTA" ColumnName="REQUIERE_RESPUESTA" />
+                <ScalarProperty Name="DNI" ColumnName="DNI" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getExisteEmbarazada" FunctionName="ProgMilDiasModel.Store.getExisteEmbarazada" />
+          <FunctionImportMapping FunctionImportName="getHistorialNotificacionPorSeguimientoID" FunctionName="ProgMilDiasModel.Store.getHistorialNotificacionPorSeguimientoID">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getHistorialNotificacionPorSeguimientoID_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="EMBARAZADA_ID" ColumnName="EMBARAZADA_ID" />
+                <ScalarProperty Name="FECHA_ENVIO" ColumnName="FECHA_ENVIO" />
+                <ScalarProperty Name="NOTIFICACION_ID" ColumnName="NOTIFICACION_ID" />
+                <ScalarProperty Name="ENVIADO" ColumnName="ENVIADO" />
+                <ScalarProperty Name="RESPUESTA" ColumnName="RESPUESTA" />
+                <ScalarProperty Name="SEGUIMIENTO_ID" ColumnName="SEGUIMIENTO_ID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListaDeRespuestas" FunctionName="ProgMilDiasModel.Store.getListaDeRespuestas">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getListaDeRespuestas_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="SEGUIMIENTO_ID" ColumnName="SEGUIMIENTO_ID" />
+                <ScalarProperty Name="RESPUESTA" ColumnName="RESPUESTA" />
+                <ScalarProperty Name="FECHA_RECEPCION_DE_RESPUESTA" ColumnName="FECHA_RECEPCION_DE_RESPUESTA" />
+                <ScalarProperty Name="REGISTRO_LEIDO" ColumnName="REGISTRO_LEIDO" />
+                <ScalarProperty Name="FECHA_LECTURA_REGISTRO" ColumnName="FECHA_LECTURA_REGISTRO" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getNotificacionPorID" FunctionName="ProgMilDiasModel.Store.getNotificacionPorID">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProgMilDiasModel.getNotificacionPorID_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="NRO_ORDEN" ColumnName="NRO_ORDEN" />
+                <ScalarProperty Name="MENSAJE" ColumnName="MENSAJE" />
+                <ScalarProperty Name="MES_GESTACION" ColumnName="MES_GESTACION" />
+                <ScalarProperty Name="REQUIERE_RESPUESTA" ColumnName="REQUIERE_RESPUESTA" />
+                <ScalarProperty Name="NOTIFICACION_ID_RESP_POS" ColumnName="NOTIFICACION_ID_RESP_POS" />
+                <ScalarProperty Name="NOTIFICACION_ID_RESP_NEG" ColumnName="NOTIFICACION_ID_RESP_NEG" />
+                <ScalarProperty Name="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" ColumnName="ES_RESPUESTA_DE_MENSAJE_ANTERIOR" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="insertNuevoRegistroEmbarazada" FunctionName="ProgMilDiasModel.Store.insertNuevoRegistroEmbarazada" />
+          <FunctionImportMapping FunctionImportName="insertNuevoRegistroHistorialNotificacion" FunctionName="ProgMilDiasModel.Store.insertNuevoRegistroHistorialNotificacion" />
+          <FunctionImportMapping FunctionImportName="insertRegistroLog" FunctionName="ProgMilDiasModel.Store.insertRegistroLog" />
+          <FunctionImportMapping FunctionImportName="registrarRespuesta" FunctionName="ProgMilDiasModel.Store.registrarRespuesta" />
+          <EntitySetMapping Name="empresa">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.empresa">
+              <MappingFragment StoreEntitySet="empresa">
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="EmpresaID" ColumnName="EmpresaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="logMensajes">
+            <EntityTypeMapping TypeName="ProgMilDiasModel.logMensajes">
+              <MappingFragment StoreEntitySet="logMensajes">
+                <ScalarProperty Name="Mensaje" ColumnName="Mensaje" />
+                <ScalarProperty Name="Origen" ColumnName="Origen" />
+                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
